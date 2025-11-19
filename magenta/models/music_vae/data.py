@@ -1257,6 +1257,7 @@ class GrooveConverter(BaseNoteSequenceConverter):
   def __init__(self, split_bars=None, steps_per_quarter=4, quarters_per_bar=4,
                max_tensors_per_notesequence=8, pitch_classes=None,
                inference_pitch_classes=None, humanize=False, tapify=False,
+               grooveboxify=False, 
                add_instruments=None, num_velocity_bins=None,
                num_offset_bins=None, split_instruments=False, hop_size=None,
                hits_as_controls=False, fixed_velocities=False,
@@ -1268,6 +1269,7 @@ class GrooveConverter(BaseNoteSequenceConverter):
 
     self._humanize = humanize
     self._tapify = tapify
+    self._grooveboxify = grooveboxify
     self._add_instruments = add_instruments
     self._fixed_velocities = fixed_velocities
 
@@ -1518,14 +1520,21 @@ class GrooveConverter(BaseNoteSequenceConverter):
       in_velocities *= note_dropout_keep_mask
       in_offsets *= note_dropout_keep_mask
 
-    if self._tapify:
-      argmaxes = np.argmax(in_velocities, axis=1)
-      in_hits[:] = 0
-      in_velocities[:] = 0
+    # seems to just like.... remove duplicate drums
+    if self._tapify: 
+      argmaxes = np.argmax(in_velocities, axis=1) # gets largest element for each row (i.e. handles if there's multiple hits at once)
+      in_hits[:] = 0 # zero out in_hits
+      in_velocities[:] = 0 
       in_offsets[:] = 0
       in_hits[:, 3] = hit_vectors[np.arange(max_step), argmaxes]
       in_velocities[:, 3] = velocity_vectors[np.arange(max_step), argmaxes]
       in_offsets[:, 3] = offset_vectors[np.arange(max_step), argmaxes]
+      
+    if self._grooveboxify:
+      drum_mappings_to_keep = [0, 1, 2, 8] # roland drum mappings of kick, snare, c-hh, and ride
+      for i in range(len(ROLAND_DRUM_PITCH_CLASSES)):
+        if i not in drum_mappings_to_keep:
+          in_hits[:, i] = 0
 
     if self._humanize:
       in_velocities[:] = 0

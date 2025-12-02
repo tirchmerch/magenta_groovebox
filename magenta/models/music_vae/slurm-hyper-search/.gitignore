@@ -1,0 +1,6 @@
+*~
+slurm-*.out
+run.sh
+space_conf.py
+__pycache__
+/scratch

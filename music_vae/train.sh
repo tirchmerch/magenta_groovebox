@@ -2,7 +2,7 @@
 #SBATCH --account=sdbarton
 #SBATCH --partition=quick
 
-# export TMPDIR=/scratch/<project>/tmp
+# export TMPDIR=/scratch/sdbarton/tmp
 
 DIR=$1
 PARAMS_OFFSET=$2
@@ -38,7 +38,7 @@ music_vae_train \
 --run_dir=/tmp/groovebox/ \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
---hparams=${PARAMS}
+--hparams="${PARAMS}"
 
 end_seconds = $SECONDS
 

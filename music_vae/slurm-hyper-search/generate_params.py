@@ -5,7 +5,7 @@ import os
 import numpy as np
 from sklearn.model_selection import ParameterSampler, ParameterGrid
 
-from space_conf import space
+from music_vae.space_conf import space
 
 
 def main(args):

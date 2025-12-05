@@ -2,7 +2,7 @@
 #SBATCH --account=sdbarton
 #SBATCH --partition=quick
 
-# export TMPDIR=/scratch/sdbarton/tmp
+export TMPDIR=/scratch/sdbarton/tmp
 
 DIR=$1
 PARAMS_OFFSET=$2
@@ -31,7 +31,6 @@ echo "$PARAMS_ID|$JOB_NAME|$SLURM_SUBMIT_DIR" >> $RUNLOG_FILE
 PARAMS=$(tail -n +${PARAMS_ID} ${PARAMS_FILE} | head -n 1)
 
 echo "*** TRAIN ***"
-start_seconds = $SECONDS
 
 music_vae_train \
 --config=groovae_2bar_groovebox \
@@ -39,11 +38,6 @@ music_vae_train \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
 --hparams="${PARAMS}"
-
-end_seconds = $SECONDS
-
-duration=$((end_seconds - start_seconds))
-echo "Execution time: $duration seconds"
 
 # exit if training failed
 test $? -ne 0 && exit 1

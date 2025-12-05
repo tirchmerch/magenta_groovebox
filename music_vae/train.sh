@@ -2,6 +2,8 @@
 #SBATCH --account=sdbarton
 #SBATCH --partition=quick
 
+# export TMPDIR=/scratch/<project>/tmp
+
 DIR=$1
 PARAMS_OFFSET=$2
 
@@ -21,7 +23,7 @@ then
     exit 1
 fi
 
-ARAMS_ID=$(( $SLURM_ARRAY_TASK_ID + $PARAMS_OFFSET ))
+PARAMS_ID=$(( $SLURM_ARRAY_TASK_ID + $PARAMS_OFFSET ))
 JOB_NAME="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 
 echo "$PARAMS_ID|$JOB_NAME|$SLURM_SUBMIT_DIR" >> $RUNLOG_FILE
@@ -29,7 +31,6 @@ echo "$PARAMS_ID|$JOB_NAME|$SLURM_SUBMIT_DIR" >> $RUNLOG_FILE
 PARAMS=$(tail -n +${PARAMS_ID} ${PARAMS_FILE} | head -n 1)
 
 echo "*** TRAIN ***"
-
 start_seconds = $SECONDS
 
 music_vae_train \
@@ -42,3 +43,21 @@ end_seconds = $SECONDS
 
 duration=$((end_seconds - start_seconds))
 echo "Execution time: $duration seconds"
+
+# exit if training failed
+test $? -ne 0 && exit 1
+
+echo "*** TEST ***"
+# we assembled the needed data to a single line in $TMPFILE
+TMPFILE=$(mktemp)
+echo -n "$PARAMS_ID|$PARAMS|$JOB_NAME|$BN|" > $TMPFILE
+
+myprog_eval.py ${MODEL_FILE} | tr '\n\t' '| ' >> $TMPFILE
+echo >> $TMPFILE
+
+# only at the end we append it to the results file
+cat $TMPFILE >> $RESULTS_FILE
+
+# cleanup
+rm $TMPFILE
+rm ${MODEL_FILE}

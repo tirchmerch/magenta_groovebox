@@ -49,7 +49,7 @@ fi
 
 echo "*** TRAIN ***"
 
-TOTAL_STEPS=410,000
+TOTAL_STEPS=410000
 
 progress_updater() {
     while true; do

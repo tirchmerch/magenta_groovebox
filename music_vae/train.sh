@@ -1,8 +1,9 @@
 #!/bin/bash
 #SBATCH --account=sdbarton
-#SBATCH --partition=quick
+#SBATCH -p short
+#SBATCH --array=1-100
 
-export TMPDIR=/scratch/sdbarton/tmp
+export TMPDIR=/groovebox/tmp
 
 DIR=$1
 PARAMS_OFFSET=$2
@@ -32,7 +33,7 @@ PARAMS=$(tail -n +${PARAMS_ID} ${PARAMS_FILE} | head -n 1)
 
 echo "*** TRAIN ***"
 
-music_vae_train \
+python music_vae_train \
 --config=groovae_2bar_groovebox \
 --run_dir=/tmp/groovebox/ \
 --mode=train \
@@ -40,14 +41,20 @@ music_vae_train \
 --hparams="${PARAMS}"
 
 # exit if training failed
-test $? -ne 0 && exit 1
+if [ $? -ne 0 ]; then
+    echo "Training failed."
+    exit 1
+fi
 
 echo "*** TEST ***"
+
+MODEL_FILE="/tmp/groovebox/model.ckpt"
+
 # we assembled the needed data to a single line in $TMPFILE
 TMPFILE=$(mktemp)
 echo -n "$PARAMS_ID|$PARAMS|$JOB_NAME|$BN|" > $TMPFILE
 
-myprog_eval.py ${MODEL_FILE} | tr '\n\t' '| ' >> $TMPFILE
+python ../music_vae/slurm-hyper-search/analyze_results.py ${MODEL_FILE} | tr '\n\t' '| ' >> $TMPFILE
 echo >> $TMPFILE
 
 # only at the end we append it to the results file

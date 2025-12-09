@@ -55,9 +55,9 @@ echo "*** TRAIN ***"
 TOTAL_STEPS=410000
 
 RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}"
-EVENT_DIR="$RUN_DIR"
+EVENT_DIR="$RUN_DIR/train"
 
-mkdir -p "$RUN_DIR"
+mkdir -p "$EVENT_DIR"
 
 
 progress_bar() {

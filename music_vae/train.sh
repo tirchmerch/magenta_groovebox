@@ -11,8 +11,8 @@
 #SBATCH --array=1-100
 
 module purge
-module load cuda/12.2
-module load python
+module load cuda/12.8
+module load python/3.8.13
 
 export TMPDIR=/home/pmtirch/groovebox/tmp
 
@@ -40,13 +40,18 @@ JOB_NAME="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 
 echo "$PARAMS_ID|$JOB_NAME|$SLURM_SUBMIT_DIR" >> $RUNLOG_FILE
 
-PARAMS=$(tail -n +${PARAMS_ID} ${PARAMS_FILE} | head -n 1)
+PARAMS=$(sed -n "${PARAMS_ID}p" ${PARAMS_FILE})
+
+if [ -z "$PARAMS" ]; then
+    echo "No params found for line ${PARAMS_ID}"
+    exit 1
+fi
 
 echo "*** TRAIN ***"
 
 python music_vae_train.py \
 --config=groovae_2bar_groovebox \
---run_dir=/home/pmtirch/groovebox/run \
+--run_dir=/home/pmtirch/groovebox/run/${JOB_NAME} \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
 --hparams="${PARAMS}"

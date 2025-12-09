@@ -11,7 +11,7 @@
 #SBATCH --array=1-100
 
 module purge
-module load cuda/12.8
+module load cuda/12.8.0/4fdo42o
 module load python/3.8.13
 
 export TMPDIR=/home/pmtirch/groovebox/tmp

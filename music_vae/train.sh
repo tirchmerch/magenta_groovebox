@@ -54,17 +54,17 @@ echo "*** TRAIN ***"
 
 TOTAL_STEPS=410000
 
-TOTAL_STEPS=410000
 RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}"
-EVENT_DIR="${RUN_DIR}/train"
+EVENT_DIR="$RUN_DIR"
 
 mkdir -p "$RUN_DIR"
-mkdir -p "$EVENT_DIR"
+
 
 progress_bar() {
     while true; do
-        if ls $EVENT_DIR/events.out.tfevents.* 1>/dev/null 2>&1; then
-            STEP=$(grep -a "global_step" $EVENT_DIR/events.out.tfevents.* | tail -1 | grep -oP 'global_step=\K[0-9]+')
+        FILE=$(ls $EVENT_DIR/events.out.tfevents.* 2>/dev/null | head -1)
+        if [ ! -z "$FILE" ]; then
+            STEP=$(grep -a "global_step" "$FILE" | tail -1 | grep -oP 'global_step=\K[0-9]+')
             if [ ! -z "$STEP" ]; then
                 PCT=$(( STEP * 100 / TOTAL_STEPS ))
                 scontrol update JobId=$SLURM_JOB_ID JobName="VAE_${PCT}%"
@@ -73,6 +73,7 @@ progress_bar() {
         sleep 30
     done
 }
+
 progress_bar &
 
 python music_vae_train.py \

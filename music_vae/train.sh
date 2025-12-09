@@ -35,7 +35,7 @@ echo "*** TRAIN ***"
 
 python music_vae_train.py \
 --config=groovae_2bar_groovebox \
---run_dir=/tmp/groovebox/ \
+--run_dir=/groovebox/run \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
 --hparams="${PARAMS}"

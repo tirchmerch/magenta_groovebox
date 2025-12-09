@@ -38,6 +38,9 @@ fi
 PARAMS_ID=$(( $SLURM_ARRAY_TASK_ID + $PARAMS_OFFSET ))
 JOB_NAME="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 
+mkdir -p "$DIR"
+touch "$RUNLOG_FILE"
+
 echo "$PARAMS_ID|$JOB_NAME|$SLURM_SUBMIT_DIR" >> $RUNLOG_FILE
 
 PARAMS=$(sed -n "${PARAMS_ID}p" ${PARAMS_FILE})
@@ -51,11 +54,12 @@ echo "*** TRAIN ***"
 
 TOTAL_STEPS=410000
 
-mkdir -p "$DIR"
-mkdir -p /home/pmtirch/groovebox/run/${JOB_NAME}
-touch "$RUNLOG_FILE"
+TOTAL_STEPS=410000
+RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}"
+EVENT_DIR="${RUN_DIR}/train"
 
-EVENT_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}/train"
+mkdir -p "$RUN_DIR"
+mkdir -p "$EVENT_DIR"
 
 progress_bar() {
     while true; do
@@ -69,14 +73,15 @@ progress_bar() {
         sleep 30
     done
 }
+progress_bar &
 
 python music_vae_train.py \
 --config=groovae_2bar_groovebox \
---run_dir=/home/pmtirch/groovebox/run/${JOB_NAME} \
+--run_dir=${RUN_DIR} \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
 --hparams="${PARAMS}" \
-> /home/pmtirch/groovebox/run/${JOB_NAME}/train_log.txt 2>&1
+> ${RUN_DIR}/train_log.txt 2>&1
 
 # exit if training failed
 if [ $? -ne 0 ]; then

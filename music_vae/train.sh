@@ -3,7 +3,7 @@
 #SBATCH -p short
 #SBATCH --array=1-100
 
-export TMPDIR=/groovebox/tmp
+export TMPDIR=/home/pmtirch/groovebox/tmp
 
 DIR=$1
 PARAMS_OFFSET=$2
@@ -35,7 +35,7 @@ echo "*** TRAIN ***"
 
 python music_vae_train.py \
 --config=groovae_2bar_groovebox \
---run_dir=/groovebox/run \
+--run_dir=/home/pmtirch/groovebox/run \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
 --hparams="${PARAMS}"

@@ -1,7 +1,18 @@
 #!/bin/bash
 #SBATCH --account=sdbarton
+#SBATCH -N 1
+#SBATCH -n 8
+#SBATCH --mem=24g
+#SBATCH -J "GrooveVAE_Train"
 #SBATCH -p short
+#SBATCH -t 12:00:00
+#SBATCH --gres=gpu:1
+#SBATCH -C "A100|V100|A30|H100|H200|P100|L40S"
 #SBATCH --array=1-100
+
+module purge
+module load cuda/12.2
+module load python
 
 export TMPDIR=/home/pmtirch/groovebox/tmp
 

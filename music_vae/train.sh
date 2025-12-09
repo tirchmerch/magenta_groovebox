@@ -62,17 +62,20 @@ mkdir -p "$RUN_DIR"
 
 progress_bar() {
     while true; do
-        FILE=$(ls $EVENT_DIR/events.out.tfevents.* 2>/dev/null | head -1)
-        if [ ! -z "$FILE" ]; then
-            STEP=$(grep -a "global_step" "$FILE" | tail -1 | grep -oP 'global_step=\K[0-9]+')
-            if [ ! -z "$STEP" ]; then
+        FILE=$(ls -t $EVENT_DIR/events.out.tfevents.* 2>/dev/null | head -1)
+        
+        if [ -n "$FILE" ]; then
+            STEP=$(grep -a -oP 'step[:=]\s*\K[0-9]+' "$FILE" | tail -1)
+            if [ -n "$STEP" ]; then
                 PCT=$(( STEP * 100 / TOTAL_STEPS ))
                 scontrol update JobId=$SLURM_JOB_ID JobName="VAE_${PCT}%"
             fi
         fi
+        
         sleep 30
     done
 }
+
 
 progress_bar &
 

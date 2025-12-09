@@ -33,7 +33,7 @@ PARAMS=$(tail -n +${PARAMS_ID} ${PARAMS_FILE} | head -n 1)
 
 echo "*** TRAIN ***"
 
-python music_vae_train \
+python music_vae_train.py \
 --config=groovae_2bar_groovebox \
 --run_dir=/tmp/groovebox/ \
 --mode=train \
@@ -46,5 +46,4 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# cleanup
-rm $TMPFILE
+echo "Training complete."

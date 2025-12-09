@@ -46,20 +46,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "*** TEST ***"
-
-MODEL_FILE="/tmp/groovebox/model.ckpt"
-
-# we assembled the needed data to a single line in $TMPFILE
-TMPFILE=$(mktemp)
-echo -n "$PARAMS_ID|$PARAMS|$JOB_NAME|$BN|" > $TMPFILE
-
-python ../music_vae/slurm-hyper-search/analyze_results.py ${MODEL_FILE} | tr '\n\t' '| ' >> $TMPFILE
-echo >> $TMPFILE
-
-# only at the end we append it to the results file
-cat $TMPFILE >> $RESULTS_FILE
-
 # cleanup
 rm $TMPFILE
-rm ${MODEL_FILE}

@@ -54,10 +54,10 @@ echo "*** TRAIN ***"
 
 TOTAL_STEPS=410000
 
-RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}"
-EVENT_DIR="$RUN_DIR/train"
+RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}/train"
+EVENT_DIR="${RUN_DIR}"
 
-mkdir -p "$EVENT_DIR"
+mkdir -p "$RUN_DIR"
 
 
 progress_bar() {
@@ -76,8 +76,7 @@ progress_bar() {
     done
 }
 
-
-progress_bar &
+(sleep 60 && progress_bar) &
 
 python music_vae_train.py \
 --config=groovae_2bar_groovebox \

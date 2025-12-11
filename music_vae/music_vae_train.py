@@ -80,6 +80,11 @@ flags.DEFINE_string(
     'log', 'INFO',
     'The threshold for what messages will be logged: '
     'DEBUG, INFO, WARN, ERROR, or FATAL.')
+flags.DEFINE_bool(
+    'eval_once', False,
+    'If true, runs eval once and then exits.'
+    'For use after trained model if not evaluated simultaneously'
+)
 
 
 # Should not be called from within the graph to avoid redundant summaries.
@@ -234,12 +239,27 @@ def evaluate(train_dir,
         tf_slim.evaluation.StopAfterNEvalsHook(num_batches),
         tf_slim.evaluation.SummaryAtEndHook(eval_dir)
     ]
-    tf_slim.evaluation.evaluate_repeatedly(
-        train_dir,
-        eval_ops=eval_op,
-        hooks=hooks,
-        eval_interval_secs=60,
-        master=master)
+    if FLAGS.eval_once:
+      # Run evaluation a single time, no looping
+      checkpoint = tf.train.latest_checkpoint(train_dir)
+      if checkpoint is None:
+          raise RuntimeError(f"No checkpoint found in {train_dir}")
+
+      print("Running single-pass evaluation using checkpoint:", checkpoint)
+
+      tf_slim.evaluation.evaluate_once(
+          master=master,
+          checkpoint_path=checkpoint,
+          logdir=eval_dir,
+          eval_op=eval_op
+      )
+    else:
+      tf_slim.evaluation.evaluate_repeatedly(
+          train_dir,
+          eval_ops=eval_op,
+          hooks=hooks,
+          eval_interval_secs=60,
+          master=master)
 
 
 def run(config_map,

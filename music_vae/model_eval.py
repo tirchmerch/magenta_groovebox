@@ -20,7 +20,8 @@ for run_id in sorted(os.listdir(BASE)):
         f"--config=groovae_2bar_groovebox",
         f"--tfds_name=groove/2bar-midionly",
         f"--run_dir={run_path}",
-        "--eval_num_batches=50"
+        "--eval_num_batches=50",
+        "--run_once=True"
     ]
 
     subprocess.run(cmd)

@@ -32,7 +32,16 @@ with open(OUTPUT_FILE, "w") as out:
         subprocess.run(cmd, check=True)
 
         eval_dir = os.path.join(run_path, "eval")
-        ea = event_accumulator.EventAccumulator(eval_dir)
+        event_files = [os.path.join(eval_dir, f) 
+            for f in os.listdir(eval_dir) 
+            if f.startswith("events.out")]
+        if not event_files:
+            print(f"No event files found for {run_id}")
+            continue
+
+        event_files.sort()
+        ea = event_accumulator.EventAccumulator(event_files[-1])
+
         ea.Reload()
 
         p5 = None

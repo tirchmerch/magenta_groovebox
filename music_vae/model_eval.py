@@ -21,7 +21,7 @@ for run_id in sorted(os.listdir(BASE)):
         f"--tfds_name=groove/2bar-midionly",
         f"--run_dir={run_path}",
         "--eval_num_batches=50",
-        "--run_once=True"
+        "--eval_once"
     ]
 
     subprocess.run(cmd)

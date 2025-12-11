@@ -1,2 +1,12 @@
 1|batch_size=512,free_bits=0,max_beta=0.2|1716435_1||
-
+2|batch_size=512,free_bits=0,max_beta=0.3|1716435_2||
+3|batch_size=512,free_bits=0,max_beta=0.4|1716435_3||
+4|batch_size=512,free_bits=0,max_beta=0.5|1716435_4||
+5|batch_size=512,free_bits=48,max_beta=0.2|1716435_5||
+6|batch_size=512,free_bits=48,max_beta=0.3|1716435_6||
+7|batch_size=512,free_bits=48,max_beta=0.4|1716435_7||
+8|batch_size=512,free_bits=48,max_beta=0.5|1716435_8||
+9|batch_size=512,free_bits=256,max_beta=0.2|1716435_9||
+10|batch_size=512,free_bits=256,max_beta=0.3|1716435_10||
+11|batch_size=512,free_bits=256,max_beta=0.4|1716435_11||
+12|batch_size=512,free_bits=256,max_beta=0.5|1716435_12||

@@ -51,31 +51,9 @@ fi
 
 echo "*** TRAIN ***"
 
-TOTAL_STEPS=410000
-
-RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}/train"
-EVENT_DIR="${RUN_DIR}"
+RUN_DIR="/home/pmtirch/groovebox/run/${JOB_NAME}"
 
 mkdir -p "$RUN_DIR"
-
-
-progress_bar() {
-    while true; do
-        FILE=$(ls -t $EVENT_DIR/events.out.tfevents.* 2>/dev/null | head -1)
-        
-        if [ -n "$FILE" ]; then
-            STEP=$(grep -a -oP 'step[:=]\s*\K[0-9]+' "$FILE" | tail -1)
-            if [ -n "$STEP" ]; then
-                PCT=$(( STEP * 100 / TOTAL_STEPS ))
-                scontrol update JobId=$SLURM_JOB_ID JobName="VAE_${PCT}%"
-            fi
-        fi
-        
-        sleep 30
-    done
-}
-
-(sleep 60 && progress_bar) &
 
 python music_vae_train.py \
 --config=groovae_2bar_groovebox \
@@ -83,6 +61,7 @@ python music_vae_train.py \
 --mode=train \
 --tfds_name=groove/2bar-midionly \
 --hparams="${PARAMS}" \
+--num_steps=50000 \
 > ${RUN_DIR}/train_log.txt 2>&1
 
 # exit if training failed

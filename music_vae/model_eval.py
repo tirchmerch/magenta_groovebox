@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 import os
 import subprocess
+from tensorboard.backend.event_processing import event_accumulator
 
 BASE = "/home/pmtirch/groovebox/run"
+OUTPUT_FILE = "/home/pmtirch/groovebox/run/p5_results.txt"
 
 def is_run_dir(path):
     return os.path.isdir(os.path.join(path, "train"))
+
+with open(OUTPUT_FILE, "w") as out:
+    out.write("run_id|P@5\n")
 
 for run_id in sorted(os.listdir(BASE)):
     run_path = os.path.join(BASE, run_id)
@@ -24,4 +29,24 @@ for run_id in sorted(os.listdir(BASE)):
         "--eval_once"
     ]
 
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
+
+    eval_dir = os.path.join(run_path, "eval")
+    ea = event_accumulator.EventAccumulator(eval_dir)
+    ea.Reload()
+
+    p5 = None
+    tag = "eval/P@5"
+    if tag in ea.scalars.Keys():
+        events = ea.scalars.Items(tag)
+        p5 = events[-1].value
+
+    if p5 is None:
+        print(f"No P@5 found for {run_id}")
+        continue
+
+    # 3. Write result
+    line = f"{run_id}|{p5}\n"
+    out.write(line)
+
+

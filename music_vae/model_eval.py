@@ -12,41 +12,41 @@ def is_run_dir(path):
 with open(OUTPUT_FILE, "w") as out:
     out.write("run_id|P@5\n")
 
-for run_id in sorted(os.listdir(BASE)):
-    run_path = os.path.join(BASE, run_id)
-    if not is_run_dir(run_path):
-        continue
+    for run_id in sorted(os.listdir(BASE)):
+        run_path = os.path.join(BASE, run_id)
+        if not is_run_dir(run_path):
+            continue
 
-    print(f"\n=== Evaluating {run_id} ===")
+        print(f"\n=== Evaluating {run_id} ===")
 
-    cmd = [
-        "python3", "music_vae_train.py",
-        "--mode=eval",
-        f"--config=groovae_2bar_groovebox",
-        f"--tfds_name=groove/2bar-midionly",
-        f"--run_dir={run_path}",
-        "--eval_num_batches=50",
-        "--eval_once"
-    ]
+        cmd = [
+            "python3", "music_vae_train.py",
+            "--mode=eval",
+            f"--config=groovae_2bar_groovebox",
+            f"--tfds_name=groove/2bar-midionly",
+            f"--run_dir={run_path}",
+            "--eval_num_batches=50",
+            "--eval_once"
+        ]
 
-    subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True)
 
-    eval_dir = os.path.join(run_path, "eval")
-    ea = event_accumulator.EventAccumulator(eval_dir)
-    ea.Reload()
+        eval_dir = os.path.join(run_path, "eval")
+        ea = event_accumulator.EventAccumulator(eval_dir)
+        ea.Reload()
 
-    p5 = None
-    tag = "eval/P@5"
-    if tag in ea.scalars.Keys():
-        events = ea.scalars.Items(tag)
-        p5 = events[-1].value
+        p5 = None
+        tag = "eval/P@5"
+        if tag in ea.scalars.Keys():
+            events = ea.scalars.Items(tag)
+            p5 = events[-1].value
 
-    if p5 is None:
-        print(f"No P@5 found for {run_id}")
-        continue
+        if p5 is None:
+            print(f"No P@5 found for {run_id}")
+            continue
 
-    # 3. Write result
-    line = f"{run_id}|{p5}\n"
-    out.write(line)
+        # 3. Write result
+        line = f"{run_id}|{p5}\n"
+        out.write(line)
 
 

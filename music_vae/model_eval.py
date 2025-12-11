@@ -15,7 +15,7 @@ for run_id in sorted(os.listdir(BASE)):
     print(f"\n=== Evaluating {run_id} ===")
 
     cmd = [
-        "python", "music_vae_train.py",
+        "python3", "music_vae_train.py",
         "--mode=eval",
         f"--config=groovae_2bar_groovebox",
         f"--tfds_name=groove/2bar-midionly",

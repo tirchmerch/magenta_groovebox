@@ -45,7 +45,7 @@ with open(OUTPUT_FILE, "w") as out:
         ea.Reload()
 
         p5 = None
-        tag = "P@5"
+        tag = "metrics/P@5"
         if tag in ea.scalars.Keys():
             events = ea.scalars.Items(tag)
             p5 = events[-1].value

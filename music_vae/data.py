@@ -1338,6 +1338,7 @@ class GrooveConverter(BaseNoteSequenceConverter):
         control_depth=control_depth,
         control_dtype=bool,
         end_token=False,
+        hop_size=16,
         presplit_on_time_changes=False,
         max_tensors_per_notesequence=max_tensors_per_notesequence)
 
@@ -1444,9 +1445,9 @@ class GrooveConverter(BaseNoteSequenceConverter):
           np_onehot(np.digitize(v, bins, right=True), num_bins, dtype=np.int32))
                        for v in vectors])
 
-    def _extract_windows(tensor, window_size, hop_size):
+    def _extract_windows(tensor, window_size, hop_size, offset):
       """Slide a window across the first dimension of a 2D tensor."""
-      return [tensor[i:i+window_size, :] for i in range(
+      return [tensor[i+offset:i+window_size+offset, :] for i in range(
           0, len(tensor) - window_size  + 1, hop_size)]
 
     note_sequence = item
@@ -1597,8 +1598,8 @@ class GrooveConverter(BaseNoteSequenceConverter):
       if self._split_instruments:
         window_size *= self._num_drums
         hop_size *= self._num_drums
-      seqs = _extract_windows(seqs, window_size, hop_size)
-      input_seqs = _extract_windows(input_seqs, window_size, hop_size)
+      seqs = _extract_windows(seqs, window_size, hop_size, 32)
+      input_seqs = _extract_windows(input_seqs, window_size, hop_size, 0)
       if controls is not None:
         controls = _extract_windows(controls, window_size, hop_size)
     else:

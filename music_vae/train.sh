@@ -71,3 +71,9 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Training complete."
+
+FINAL_LOSS=$(grep "loss =" ${RUN_DIR}/train_log.txt | tail -n 1 | awk '{print $NF}')
+
+RESULTS_FILE="/home/pmtirch/groovebox/run/final_losses.txt"
+
+echo "${JOB_NAME}|${FINAL_LOSS}" >> ${RESULTS_FILE}
